@@ -22,7 +22,10 @@ Options:
 """
 
 import argparse
+import csv
+import io
 import json
+import re
 import sys
 from datetime import datetime
 from typing import Optional
@@ -113,6 +116,9 @@ class SSSBScraper:
         "apartment": "BOASL",
         "all": ""
     }
+    
+    # Number of fields per listing row in the SSSB listing page
+    FIELDS_PER_LISTING = 8
     
     def __init__(self, headless: bool = True, timeout: int = 30):
         self.headless = headless
@@ -228,7 +234,6 @@ class SSSBScraper:
             if deadline_elem:
                 text = deadline_elem.text
                 # Extract date from text like "Application deadline: 2024-01-15 at 12:00"
-                import re
                 date_match = re.search(r"(\d{4}-\d{2}-\d{2})", text)
                 if date_match:
                     return date_match.group(1)
@@ -287,13 +292,13 @@ class SSSBScraper:
             listing_text = listing_container.text
             rows = listing_text.split("\n")
             
-            # Parse each listing (8 fields per row)
+            # Parse each listing (each listing has FIELDS_PER_LISTING lines)
             links = [link.get_attribute("href") for link in listing_links]
             
-            # Group rows into listings (each listing has 8 lines)
+            # Group rows into listings
             for i, link in enumerate(links):
-                start_idx = i * 8
-                end_idx = start_idx + 8
+                start_idx = i * self.FIELDS_PER_LISTING
+                end_idx = start_idx + self.FIELDS_PER_LISTING
                 if end_idx <= len(rows):
                     row_text = "\n".join(rows[start_idx:end_idx])
                     housing = self._parse_listing_row(row_text, link)
@@ -348,13 +353,15 @@ def format_json(housings: list[Housing]) -> str:
 
 
 def format_csv(housings: list[Housing]) -> str:
-    """Format housings as CSV."""
-    lines = []
+    """Format housings as CSV using the csv module for proper formatting."""
+    output = io.StringIO()
+    writer = csv.writer(output, quoting=csv.QUOTE_MINIMAL)
+    
     headers = [
         "Name", "Area", "Address", "Type", "Floor", "Living Space", 
         "Rent", "Move-in Date", "Best Bid", "Applicants", "Closing Date", "Link"
     ]
-    lines.append(",".join(headers))
+    writer.writerow(headers)
     
     for h in housings:
         row = [
@@ -362,11 +369,9 @@ def format_csv(housings: list[Housing]) -> str:
             h.rent, h.move_in_date, h.queue_days, h.applicants, 
             h.closing_date or "", h.link
         ]
-        # Escape commas and quotes in values
-        row = [f'"{v.replace(chr(34), chr(34)+chr(34))}"' if "," in v or '"' in v else v for v in row]
-        lines.append(",".join(row))
+        writer.writerow(row)
     
-    return "\n".join(lines)
+    return output.getvalue().rstrip('\n')
 
 
 def main():
