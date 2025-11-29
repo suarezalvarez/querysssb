@@ -1,0 +1,16 @@
+[project]
+name = "querysssb"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.14"
+dependencies = [
+    "dotenv>=0.9.9",
+    "matplotlib>=3.10.7",
+    "mechanicalsoup>=1.4.0",
+    "mechanize>=0.4.10",
+    "pandas>=2.3.3",
+    "plotnine>=0.15.1",
+    "selenium>=4.38.0",
+    "webdriver-manager>=4.0.2",
+]
