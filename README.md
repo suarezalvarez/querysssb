@@ -1,2 +1,2 @@
 # querysssb
-Query sssb portal
+This is an automated way of 
