@@ -47,6 +47,9 @@ bash runit.sh
 
 This will scrap SSSB and show you the plot in PDF, that is stored in `storage`. 
 
+## Future
+
+My intention is to couple this with Github actions so is somehow automated and the plot can be mailed to the user.
 # Project structure
 
 ```
