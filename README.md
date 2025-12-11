@@ -21,7 +21,8 @@ uv sync
 ```
 You need to have google chrome installed. 
 
-Then you should create a file named `.env` in the root of the directory. Here you are going to store two environment variables that have
+## Settings
+You should create a file named `.env` in the root of the directory. Here you are going to store two environment variables that have
 your credentials for SSSB:
 
 ```bash
@@ -33,6 +34,14 @@ PASSWORD=your_sssb_password
 >It's important that you use exactly the same name for these variables
 
 
+You can change the `config/settings.py` script to change the type of apartment. By default, it will look for student apartments (code `BOASL`). The code for each apartment is:
+
+- BOAS1: studio apartment
+- BOASL: student apartment
+- BOASR: student room
+- All: all
+
+## Use it
 You can run directly the `doit.sh` script in two ways:
 
 ```bash
